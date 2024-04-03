@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Administrator Portal</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body { padding: 20px; }
+        .status { padding: 10px; margin-top: 20px; }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+            socket.on('connect', function() {
+                console.log('Administrator connected');
+            });
+
+            socket.on('survey status', function(data) {
+                // Accessing the status and name from the received object
+                var statusText = 'Status: ' + data.status + ', Survey Name: ' + data.name;
+                $('#status').text(statusText);
+            });
+
+            socket.on('update admin view', function(data) {
+                var tableBody = $('#surveyStatusTable tbody');
+                tableBody.empty(); // Clear existing entries
+
+                // Corrected to iterate over `data`
+                data.forEach(function(item) {
+                    console.log(item); // This should log each tuple/array
+                    var sessionId = item[0];
+                    var participantId = item[1];
+                    var status = item[2];
+
+                    var row = $('<tr>');
+                    row.append($('<td>').text(sessionId)); // Append sessionId
+                    row.append($('<td>').text(participantId)); // Append Participant ID
+                    row.append($('<td>').text(status)); // Append Status
+                    tableBody.append(row);
+                });
+            });
+
+            $('#openSurvey').click(function() {
+                let surveyName = $('#surveyName').val();
+                if(surveyName) {
+                    socket.emit('open survey', surveyName);
+                }
+            });
+
+            $('#closeSurvey').click(function() {
+                socket.emit('close survey');
+            });
+        });
+    </script>
+</head>
+<body>
+    <h2>Administrator Portal</h2>
+    <div class="form-group">
+        <label for="surveyName">Survey Name:</label>
+        <select id="surveyName" class="form-control">
+            <option value=""></option>
+            {% for scenario in scenarios %}
+            <option value="{{ scenario }}">{{ scenario }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <button id="openSurvey" class="btn btn-primary">Open Survey</button>
+    <button id="closeSurvey" class="btn btn-danger">Close Survey</button>
+    <div id="status" class="status"></div>
+    <table id="surveyStatusTable" class="table table-condensed">
+        <thead>
+            <tr>
+                <th>Session ID</th>
+                <th>Participant ID</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!--Dynamic list-->
+        </tbody>
+    </table>
+</body>
+</html>

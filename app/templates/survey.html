@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Survey</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body { padding: 20px; }
+        #message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000; /* Ensure it's above other content */
+            padding: 20px;
+            border-radius: 5px;
+            background-color: palegoldenrod; /* Example background */
+            color: black; /* Example text color */
+            border: 1px solid #ccc; /* Example border */
+            display: none; /* Hidden by default, shown via JavaScript */
+            width: auto; /* Or set a fixed width */
+            max-width: 80%; /* Maximum width */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: Adds some shadow */
+        }
+
+        #closeMessage {
+            float: right;
+            font-size: 20px;
+            line-height: 20px;
+            cursor: pointer;
+        }
+
+        #messageContent {
+            clear: both; /* Ensures content is below the close button */
+            padding-top: 10px; /* Adds some space between the close button and the content */
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border-color: #c3e6cb;
+        }
+
+        .survey-container { margin-top: 20px; width: 72em;}
+
+        .dimension-label {
+            font-weight: bold;
+            margin-bottom: 0.5em;
+        }
+
+        .btn-group {
+            align-items: center; /* Vertically center the items in the flex container */
+        }
+        .btn-group span {
+            flex-grow: 1;
+        }
+        
+        input[type='radio'] {
+            box-sizing: border-box;
+            appearance: none;
+            background: white;
+            outline: 1px solid #999;
+            border: 1px solid white;
+            width: 3.5em;
+            height: 2em;
+        }
+
+        input[type='radio']:checked {
+            background: #333;
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="noSurveyMessage" class="alert hidden">
+            No survey available at the moment. Please wait for the next survey to open.
+        </div>
+        <!-- Add this near the top for messages -->
+        <div id="message" class="alert hidden">
+            <button id="closeMessage" class="close">&times;</button>
+            <div id="messageContent"></div>
+        </div>
+
+        <div id="participantIdPrompt" class="form-group">
+            <label for="participantId">Participant ID:</label>
+            <select id="participantId" class="form-control">
+                {% for participant_id in participants %}
+                <option value="{{ participant_id }}">{{ participant_id }}</option>
+                {% endfor %}
+            </select>
+            <button id="submitId" class="btn btn-primary mt-2">Submit ID</button>
+        </div>
+        <div id="survey" class="hidden">
+            <h3 id="surveyTitle">{{ survey_name }}</h3>
+            <form id="nasaTlxForm" class="survey-container">
+                {% for (dimension, prompt) in dimensions %}
+                <div class="form-group">
+                    <label class="dimension-label">{{ dimension }}</label>
+                    <p>{{ prompt }}</p>
+                    <div  class="btn-group d-flex" role="group" aria-label="{{ dimension }}">
+                        {% for value in range(21) %}
+                        <input type="radio" id="{{ dimension | lower | replace(' ', '') }}-{{ value }}" name="{{ dimension | lower | replace(' ', '') }}" value="{{ value }}" class="btn-check">
+                        {% endfor %}
+                    </div>
+                    <div class="btn-group d-flex" role="group" >
+                        <span class="flex-grow-1 text-left">Very Low</span>
+                        <span class="flex-grow-1 text-right">Very High</span>
+                    </div>
+                </div>
+                {% endfor %}
+                <button type="submit" class="btn btn-success">Submit</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <script>
+
+        function setSurveyView (status, name) {
+            console.log(status, name);
+            $('#surveyTitle').html(name);
+            $('#message').addClass('hidden').hide();
+            if (status === 'open') {
+                $('#survey').removeClass('hidden');
+                $('#nasaTlxForm input, #nasaTlxForm button').prop('disabled', false);
+                $('#nasaTlxForm input[type="radio"]').prop('checked', false);
+                $('#noSurveyMessage').addClass('hidden');
+            } else {
+                $('#survey').addClass('hidden');
+                $('#noSurveyMessage').removeClass('hidden');
+
+            }                    
+        }
+
+        $(document).ready(function() {
+            var socket = io.connect('http://' + document.domain + ':' + location.port);
+            var surveyStatus = '{{ survey_status }}'; // Tracks the survey's open/closed status
+            var surveyName = '{{ survey_name }}';
+
+            $('#submitId').click(function() {
+                var participantId = $('#participantId').val();
+                if(participantId) {
+                    $('#participantIdPrompt').addClass('hidden');
+                    setSurveyView(surveyStatus);
+                    socket.emit('confirm survey', {participantId: participantId, surveyStatus: "Logged In"});
+                }
+            });
+                
+            // Handling the survey submission acknowledgement
+            socket.on('survey response', function(data) {    // Prepare the close button HTML
+                var participantId = $('#participantId').val();
+                
+                $('#messageContent').html(data.message + 
+                    '<br>Close to resume survey or wait for the next survey to open...');
+                
+                // Display submission success message, add close button, and make visible
+                $('#message').removeClass('hidden')
+                             .addClass('alert-success')
+                             .show(); // Use .show() to make it visible
+                
+                // Close button click event
+                $('#closeMessage').click(function() {
+                    socket.emit('confirm survey', {participantId: participantId, surveyStatus: "Open"});
+                    $('#message').hide(); // Hide the message div
+                });
+            });
+
+            // Listening for survey status to enable the form for the next survey
+            socket.on('survey status', function(data) {
+                var participantId = $('#participantId').val();
+
+                surveyStatus = data.status;
+                surveyName = data.name;
+                socket.emit('confirm survey', {participantId: participantId, surveyStatus: surveyStatus});
+                setSurveyView(surveyStatus, surveyName);
+            });
+
+            $('#nasaTlxForm').submit(function(e) {
+                e.preventDefault();
+                
+                // Flag to check if the form is fully filled
+                var isFormValid = true;
+
+                // Only consider .form-group elements within this form
+                $(this).find('.form-group').each(function() {
+                    // Check if this group has a checked radio button within the form
+                    var hasChecked = $(this).find('input[type="radio"]:checked').length > 0;
+
+                    if (!hasChecked) {
+                        // If no radio button is checked, mark this form group
+                        $(this).css({
+                            'border': '1px solid red',
+                            'padding-left': '10px', // Adjust as needed
+                            'padding-right': '10px' // Adjust as needed
+                        });
+                        isFormValid = false;
+                    } else {
+                        // If radio button is checked, remove the styles
+                        $(this).css({
+                            'border': '',
+                            'padding-left': '', // Reset to default
+                            'padding-right': '' // Reset to default
+                        });
+                    }
+                });
+
+
+                // If code execution reaches here, all inputs are valid
+                var formData = $(this).serializeArray();
+                var participantId = $('#participantId').val();
+                var surveyData = {participantId: participantId, responses: formData};
+
+                // If the form is not valid, stop here
+                if (!isFormValid) {
+                    alert('Please complete the survey.');
+                    socket.emit('submit partial survey', surveyData);
+                
+                } else {
+                    socket.emit('submit survey', surveyData);
+                }
+
+            });
+
+
+        });
+    </script>
+</body>
+</html>
