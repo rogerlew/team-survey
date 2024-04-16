@@ -1,0 +1,28 @@
+title: FPOG Workshop Survey Tool
+scenarios:
+  - Scenario1
+  - Scenario2
+  - Scenario3
+  - Scenario4
+  - Scenario5
+  - Scenario6
+  - Scenario7
+  - Scenario8
+  - Scenario9
+groups:
+  Operator:
+    participants:
+      - Operator1
+      - Operator2
+      - Operator3
+      - Operator4
+    form_id: _tlx_sart_hybrid_form
+    validate_form: true
+  Expert-observer:
+    participants:
+      - ExpertObserver1
+      - ExpertObserver2
+      - ExpertObserver3
+      - ExpertObserver4
+    form_id: _score_generic_form
+    validate_form: false

@@ -1,0 +1,67 @@
+{%
+    set dimensions = {
+        "Monitoring": [
+            "Made observations based on procedure specifications",
+            "Made observations beyond procedure specifications",
+            "Used redundant and complimentary information"
+        ],
+        "Interpretation": [
+            "Achieved process understanding through the proper interpretation of observed parameters",
+            "Correctly predicted the impact of control actions before execution",
+        ],
+        "Strategy & Actions": [
+            "Followed the selected procedure only",
+            "Implemented steps not included in the selected procedures when necessary",
+            "Complied with the procedure requirements"
+        ],
+        "Control & Verification": [
+            "Verified actions by checking process responses",
+            "Monitored progress toward the accomplishment of scenario goal and took timely dynamic control actions",
+            "Complied with the procedure requirements"
+        ],
+        "Teamwork": [
+            "Information sharing",
+            "Effective decision-making",
+            "Communication"
+        ]
+    }
+
+%}
+
+<form id="theForm" class="survey-container">
+    {% for dimension in dimensions %}
+    <h4>{{dimension}}</h4>
+
+    {% for prompt in dimensions[dimension] %}
+    <div class="form-group">
+        <p>{{ prompt }}</p>
+        <div class="btn-group d-flex" role="group" aria-label="{{ prompt }}">
+            {% for value in range(21) %}
+            <input type="radio" id="{{ prompt | lower | replace(' ', '') }}-{{ value }}" name="{{ prompt | lower | replace(' ', '') }}" value="{{ value }}" class="btn-check">
+            {% endfor %}
+        </div>
+        <div class="btn-group d-flex" role="group" >
+            <span class="flex-grow-1 text-left">Not Acceptable</span>
+            <span class="flex-grow-1 text-right">Acceptable</span>
+        </div>
+    </div>
+    {% endfor %}
+    <!-- Collapsible textbox for optional feedback -->
+    <div class="mt-2"> 
+        <a class="btn btn-link" data-toggle="collapse" 
+           href="#{{ dimension | lower | replace(' ', '') }}-feedback-collapse" 
+           role="button" aria-expanded="false" 
+           aria-controls="{{ dimension | lower | replace(' ', '') }}-feedback-collapse"> 
+           Add optional feedback
+        </a> 
+        <div class="collapse" id="{{ dimension | lower | replace(' ', '') }}-feedback-collapse"> 
+            <div class="form-group"> 
+                <textarea class="form-control" 
+                  name="{{ dimension | lower | replace(' ', '') }}_feedback" rows="3" 
+                  placeholder="Enter your feedback"></textarea> 
+            </div> 
+        </div> 
+    </div>
+    {% endfor %}
+    <button type="submit" class="btn btn-success">Submit</button>
+</form>
