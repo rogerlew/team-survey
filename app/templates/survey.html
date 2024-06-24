@@ -55,7 +55,7 @@
             flex-grow: 1;
         }
         
-        input[type='radio'] {
+        input[type='radio'].box-radio {
             box-sizing: border-box;
             appearance: none;
             background: white;
@@ -98,7 +98,6 @@
     </div>
     <div id="config" data-validation="{{ group.validate_form | string | lower }}"></div>
     <script>
-
         $(document).ready(function() {
             var socket = io.connect('http://' + document.domain + ':' + location.port);
             var surveyStatus = '{{ survey_status }}'; // Tracks the survey's open/closed status
@@ -140,7 +139,16 @@
                     $('#survey').removeClass('hidden');
                     $('#theForm input, #theForm button').prop('disabled', false);
                     $('#theForm input[type="radio"]').prop('checked', false);
+                    $('#theForm textarea').val('');
                     $('#noSurveyMessage').addClass('hidden');
+
+                    if (name === 'Scenario A13 - Fault' || name === 'Scenario A13 - Fault'){
+                        $('#sus').removeClass('hidden');
+                    }
+                    else {
+                        $('#sus').addClass('hidden');
+                    }
+                    
 
                     // check for data from /survey_responses/<survey_name>/<participant_id>
                     // and load into the form
@@ -255,9 +263,7 @@
                 } else {
                     socket.emit('submit survey', surveyData);
                 }
-
             });
-
         });
     </script>
 </body>

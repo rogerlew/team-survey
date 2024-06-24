@@ -28,6 +28,33 @@
     ('Frustration',
      'How insecure, discouraged, irritated, stressed, and annoyed were you?')
     ]
+
+%}
+
+{%
+
+    set sus_prompts = [
+    ('1',
+     'I think I would like to use this system frequently.'),
+     ('2',
+     'I found the system unnecessarily complex.'),
+     ('3',
+     'I thought the system was easy to use.'),
+     ('4',
+     'I think that I would need the support of a technical person to be able to use this system.'),
+     ('5',
+     'I found the various functions in this system were well integrated.'),
+     ('6',
+     'I thought there was too much inconsistency in the system.'),
+     ('7',
+     'I would imagine that most people would learn to use this system very quickly.'),
+     ('8',
+     'I found the system very cumbersome to use.'),
+     ('9',
+     'I felt very confident using the system.'),
+     ('10',
+     'I needed to learn a lot of things before I could get going with this system.'),
+    ]
 %}
 
 <form id="theForm" class="survey-container">
@@ -37,7 +64,7 @@
         <p>{{ prompt }}</p>
         <div  class="btn-group d-flex" role="group" aria-label="{{ dimension }}">
             {% for value in range(21) %}
-            <input type="radio" id="{{ dimension | lower | replace(' ', '') }}-{{ value }}" name="{{ dimension | lower | replace(' ', '') }}" value="{{ value }}" class="btn-check">
+            <input class="box-radio" type="radio" id="{{ dimension | lower | replace(' ', '') }}-{{ value }}" name="{{ dimension | lower | replace(' ', '') }}" value="{{ value }}" class="btn-check">
             {% endfor %}
         </div>
         <div class="btn-group d-flex" role="group" >
@@ -61,5 +88,32 @@
         </div>
     </div>
     {% endfor %}
+
+    <div id="sus">
+    <h4>System Usability Survey (SUS)</h4>
+    <p>Instructions: As you rate the usability of the system, imagine you are required to use the system as part of your day-to-day, routine, work.
+    </p>
+
+    {% for (dimension, prompt) in sus_prompts %}
+    <div class="form-group">
+        <p><b>{{ prompt }}</b></p>
+        <div  class="btn-group d-flex" role="group" aria-label="{{ dimension }}">
+            {% for value in range(7) %}
+                <label style="margin-right:2em;">{{value}}
+                    <input type="radio" id="{{ dimension | lower | replace(' ', '') }}-{{ value }}" 
+                        name="{{ dimension | lower | replace(' ', '') }}" value="{{ value }}">
+                </label>
+            {% endfor %}
+        </div>
+        <div style="width:30em;">
+            <div class="btn-group d-flex" role="group" >
+                <span class="flex-grow-1 text-left">Strongly disagree (0)</span>
+                <span class="flex-grow-1 text-right">Strongly agree (6)</span>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    </div>
+
     <button type="submit" class="btn btn-success">Submit</button>
 </form>

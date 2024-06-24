@@ -164,6 +164,7 @@ def handle_open_survey(data: dict):
     global survey_status, survey_name
     survey_status = 'open'
     survey_name = data
+
     print(f"Survey opened: {survey_name}")
     emit('survey status', {'status': survey_status, 'name': survey_name}, broadcast=True)
 

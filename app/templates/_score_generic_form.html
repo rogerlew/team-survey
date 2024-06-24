@@ -37,7 +37,7 @@
         <p>{{ prompt }}</p>
         <div class="btn-group d-flex" role="group" aria-label="{{ prompt }}">
             {% for value in range(21) %}
-            <input type="radio" id="{{ prompt | lower | replace(' ', '') }}-{{ value }}" name="{{ prompt | lower | replace(' ', '') }}" value="{{ value }}" class="btn-check">
+            <input class="box-radio" type="radio" id="{{ prompt | lower | replace(' ', '') }}-{{ value }}" name="{{ prompt | lower | replace(' ', '') }}" value="{{ value }}" class="btn-check">
             {% endfor %}
         </div>
         <div class="btn-group d-flex" role="group" >

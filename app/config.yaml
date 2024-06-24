@@ -1,14 +1,33 @@
 title: FPOG Workshop Survey Tool
 scenarios:
-  - Scenario1
-  - Scenario2
-  - Scenario3
-  - Scenario4
-  - Scenario5
-  - Scenario6
-  - Scenario7
-  - Scenario8
-  - Scenario9
+  - Scenario A0 - SGTR Scenario Dry-run (TPD Offline) and Troubleshooting
+  - Scenario A1 - SGTR (TPD Offline)
+  - Scenario A2 - SGTR (TPD Online)
+  - Scenario A3 - TPD Startup in Manual Control
+  - Scenario A4 - TPD Startup in Auto Control
+  - Scenario A5 - TPD Shutdown in Manual Control
+  - Scenario A6 - TPD Shutdown in Auto Control
+  - Scenario A7 - Fault
+  - Scenario A8 - Fault
+  - Scenario A9 - Fault
+  - Scenario A10 - Fault
+  - Scenario A11 - Fault
+  - Scenario A12 - Fault
+  - Scenario A13 - Fault
+  - Scenario B1 - SGTR (TPD Offline)
+  - Scenario B2 - SGTR (TPD Online)
+  - Scenario B3 - TPD Startup (Bring 2 Trains Online)
+  - Scenario B4 - TPD Shutdown (Bring 2 Trains to Hot Standby)
+  - Scenario B5 - Fault
+  - Scenario B6 - Fault
+  - Scenario B7 - Fault
+  - Scenario B8 - Fault
+  - Scenario B9 - Fault
+  - Scenario B10 - Fault
+  - Scenario B11 - Fault
+  - Scenario B12 - Fault
+  - Scenario B13 - Fault
+  - Scenario B14 - Fault
 groups:
   Operator:
     participants:
