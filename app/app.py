@@ -177,6 +177,5 @@ def handle_close_survey():
     print("Survey closed")
     emit('survey status', {'status': survey_status, 'name': survey_name}, broadcast=True)
 
-
 if __name__ == '__main__':
-    socketio.run(app, debug=True)
+    socketio.run(app, host='0.0.0.0', port=5000, debug=True)
